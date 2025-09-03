@@ -206,7 +206,7 @@ else:
         messages = [{"role": "user", "content": original_prompt}]
 
         # Try four different models.
-        models = ["gpt-3.5", "gpt-4.1", "gpt-5-chat-latest", "gpt-5-nano"]
+        models = ["gpt-3.5-turbo", "gpt-4.1", "gpt-5-chat-latest", "gpt-5-nano"]
         responses = {}
 
         for model in models:
