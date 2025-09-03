@@ -161,7 +161,8 @@ def read_pdf(file):
 st.title("Document buddy")
 st.write(
     "Upload a document below and ask a question about it – GPT will answer! "
-    "To use this app, you need to provide an OpenAI API key, which you can get [here](https://platform.openai.com/account/api-keys). "
+    "To use this app, you need to provide an OpenAI API key, which you can get "
+    "[here](https://platform.openai.com/account/api-keys). "
 )
 
 # Ask user for their OpenAI API key.
@@ -201,19 +202,14 @@ else:
             st.stop()
 
         # Build the initial message using the document and question.
-        messages = [
-            {
-                "role": "user",
-                "content": f"Here's a document: {document} \n\n---\n\n {question}",
-            }
-        ]
+        original_prompt = f"Here's a document: {document} \n\n---\n\n {question}"
+        messages = [{"role": "user", "content": original_prompt}]
 
         # Try four different models.
         models = ["gpt-3.5", "gpt-4.1", "gpt-5-chat-latest", "gpt-5-nano"]
         responses = {}
 
         for model in models:
-            # Note: Using non-streaming for simplicity in comparing answers.
             response = client.chat.completions.create(
                 model=model,
                 messages=messages,
@@ -221,19 +217,23 @@ else:
             answer = response["choices"][0]["message"]["content"]
             responses[model] = answer
 
-        # Display each answer.
-        st.subheader("Model responses:")
-        for model, answer in responses.items():
-            st.markdown(f"**{model}:**")
-            st.write(answer)
-            st.write("---")
+        # Create tabs for each model response.
+        tabs = st.tabs(models)
+        for i, model in enumerate(models):
+            with tabs[i]:
+                st.subheader(f"Response from {model}")
+                st.markdown("**Original Prompt:**")
+                st.write(original_prompt)
+                st.markdown("---")
+                st.markdown("**Model Answer:**")
+                st.write(responses[model])
         
         # Provide explanation regarding quality, cost and speed.
         st.subheader("Analysis")
         st.write(
-            "Based on our tests, the best answer quality typically comes from models that have more advanced reasoning capabilities (e.g. gpt-4.1 or gpt-5-chat-latest). However, "
-            "models like gpt-5-chat-latest may achieve a good balance between answer quality, speed, and cost. In contrast, while gpt-3.5 is the fastest and cheapest, "
-            "its answer quality might be lower for complex questions. The gpt-5-nano may be faster and cheaper than gpt-5-chat-latest, but also less capable. "
-            "In this case, if overall quality is the priority, gpt-4.1 or gpt-5-chat-latest may be considered best. Including cost and speed constraints, "
-            "gpt-5-chat-latest appears to offer the best trade-off."
+            "Based on our tests, the best answer quality typically comes from models that have more advanced reasoning capabilities "
+            "(e.g. gpt-4.1 or gpt-5-chat-latest). However, models like gpt-5-chat-latest may achieve a good balance between answer quality, speed, "
+            "and cost. In contrast, while gpt-3.5 is the fastest and cheapest, its answer quality might be lower for complex questions. The gpt-5-nano may "
+            "be faster and cheaper than gpt-5-chat-latest, but also less capable. In this case, if overall quality is the priority, gpt-4.1 or gpt-5-chat-latest "
+            "may be considered best. Including cost and speed constraints, gpt-5-chat-latest appears to offer the best trade-off."
         )
