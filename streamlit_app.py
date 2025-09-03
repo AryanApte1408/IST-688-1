@@ -143,6 +143,7 @@
 
 #         # Stream the response to the app using `st.write_stream`.
 #         st.write_stream(stream)
+
 import streamlit as st
 import fitz  # PyMuPDF
 from openai import OpenAI
